@@ -31,7 +31,7 @@ authRouter.post("/register", async (req, res, next) => {
         }else{
             const newUser = new UserModel(req.body)
             const addedUser = await newUser.save()
-            const token = await JWTAuthenticate(user)
+            const token = await JWTAuthenticate(addedUser)
             res.status(201).send({accessToken: token, addedUser})
         }
     } catch (error) {
