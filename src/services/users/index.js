@@ -1,6 +1,7 @@
 import { Router } from "express"
 import createError from "http-errors"
 import passport from "passport"
+import { JWTAuthMiddleware } from "../../auth/middlewares.js"
 import UserModel from "./schema.js"
 import { hostOnly } from "./sharedMiddlewares.js"
 
@@ -8,7 +9,7 @@ const usersRouter = Router()
 
 /***************GET ALL USERS*******************/
 
-usersRouter.get("/", hostOnly, async (req, res, next) => {
+usersRouter.get("/", JWTAuthMiddleware, hostOnly, async (req, res, next) => {
     try {
         const users = await UserModel.find()
         res.send(users)
@@ -20,7 +21,7 @@ usersRouter.get("/", hostOnly, async (req, res, next) => {
 
 /***************GET ONLY YOUR USER DETAILS*******************/
 
-usersRouter.get("/me", async (req, res, next) => {
+usersRouter.get("/me",JWTAuthMiddleware, async (req, res, next) => {
     try {
         res.send(req.user)
     } catch (error) {
@@ -31,7 +32,7 @@ usersRouter.get("/me", async (req, res, next) => {
 
 /***************GET USER DEATILS BY SPECIFIC ID*******************/
 
-usersRouter.get("/:userId", hostOnly, async (req, res, next) => {
+usersRouter.get("/:userId",JWTAuthMiddleware, hostOnly, async (req, res, next) => {
     try {
         const userId = req.params.userId
         const user = await UserModel.findById(userId)
@@ -67,7 +68,7 @@ usersRouter.post("/", async (req, res, next) => {
 
 /***************EDIT ONLY YOUR USER DEATILS*******************/
 
-usersRouter.put("/me", async (req, res, next) => {
+usersRouter.put("/me",JWTAuthMiddleware, async (req, res, next) => {
     try {
         req.user = {...req.body}
         const editUser = await req.user.save()
@@ -80,7 +81,7 @@ usersRouter.put("/me", async (req, res, next) => {
 
 /***************EDIT USER DEATILS BY ID*******************/
 
-usersRouter.put("/:userId", hostOnly, async (req, res, next) => {
+usersRouter.put("/:userId", JWTAuthMiddleware, hostOnly, async (req, res, next) => {
     try {
         const userId = req.params.userId
         const editUser = await UserModel.findByIdAndUpdate(userId, req.body,{
@@ -100,7 +101,7 @@ usersRouter.put("/:userId", hostOnly, async (req, res, next) => {
 
 /***************DELETE ONLY YOUR USER DEATILS*******************/
 
-usersRouter.delete("/me", async (req, res, next) => {
+usersRouter.delete("/me",JWTAuthMiddleware,  async (req, res, next) => {
     try {
         await req.user.deleteOne()
         res.status(204).send()
@@ -112,7 +113,7 @@ usersRouter.delete("/me", async (req, res, next) => {
 
 /***************DELETE USER DETAILS BY ID*******************/
 
-usersRouter.delete("/:userId", hostOnly, async (req, res, next) => {
+usersRouter.delete("/:userId", JWTAuthMiddleware, hostOnly, async (req, res, next) => {
     try {
         const userId = req.params.userId
         const user = await UserModel.findByIdAndDelete(userId)

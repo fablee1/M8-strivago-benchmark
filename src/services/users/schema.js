@@ -28,6 +28,9 @@ const UserSchema = new Schema(
         facebookId:{
             type: String
         },
+        refreshToken:{
+            type: String
+        },
         role:{
             type: String,
             enum:['Host', 'Guest'],
