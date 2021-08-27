@@ -18,6 +18,7 @@ import facebookStrategy from "./auth/oauth.js"
 const port = process.env.PORT || 3001
 const server = express()
 
+server.use(cookieParser())
 passport.use("facebook", facebookStrategy)
 
 // Middlewares
@@ -35,13 +36,12 @@ server.use(
     credentials: true,
   })
 )
-server.use(cookieParser())
 server.use(passport.initialize())
 server.use(express.json())
 server.use(morgan("dev"))
 
 server.use("/users", usersRouter)
-server.use("/accomodations", accomodationsRouter)
+server.use("/accomodation", accomodationsRouter)
 server.use("/auth", authRouter)
 
 server.use([errorMiddlewares])
