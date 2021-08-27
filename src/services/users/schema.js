@@ -18,14 +18,17 @@ const UserSchema = new Schema(
     email: {
       type: String,
       description: "email is a required field",
-      index: {
-        unique: true,
-      },
+      // index: {
+      //   unique: true,
+      // },
     },
     password: {
       type: String,
     },
     facebookId: {
+      type: String,
+    },
+    googleId: {
       type: String,
     },
     refreshToken: {

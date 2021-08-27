@@ -33,7 +33,7 @@ accomodationsRouter.get("/:id", JWTAuthMiddleware, async (req, res, next) => {
 
 accomodationsRouter.post("/", JWTAuthMiddleware, hostOnly, async (req, res, next) => {
   try {
-    const newAccomodation = new AccomodationModel(req.body)
+    const newAccomodation = new AccomodationModel({ ...req.body, host: req.user.id })
     const { _id } = await newAccomodation.save()
     res.status(201).send({ _id })
   } catch (error) {

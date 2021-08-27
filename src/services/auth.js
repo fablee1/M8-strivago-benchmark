@@ -1,7 +1,7 @@
 import { Router } from "express"
 import createError from "http-errors"
 import passport from "passport"
-import { JWTAuthenticate, refreshToken } from "../auth/tools.js"
+import { JWTAuthenticate, refreshTokenFunc } from "../auth/tools.js"
 import UserModel from "./users/schema.js"
 
 const authRouter = Router()
@@ -14,14 +14,14 @@ authRouter.post("/login", async (req, res, next) => {
       const { accessToken, refreshToken } = await JWTAuthenticate(user)
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
+        secure: false,
       })
-      res.cookie("refreshToken", refreshToken, { httpOnly: true })
+      res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: false })
       res.redirect(`http://localhost:4000/users/me`)
     } else {
       next(createError(401, "Credentials are not valid"))
     }
   } catch (error) {
-    console.log(error)
     next(error)
   }
 })
@@ -38,12 +38,12 @@ authRouter.post("/register", async (req, res, next) => {
       const { accessToken, refreshToken } = await JWTAuthenticate(addedUser)
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
+        secure: false,
       })
-      res.cookie("refreshToken", refreshToken, { httpOnly: true })
+      res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: false })
       res.redirect(`http://localhost:4000/users/me`)
     }
   } catch (error) {
-    console.log(error)
     next(error)
   }
 })
@@ -54,12 +54,15 @@ authRouter.get(
   "/facebookRedirect",
   passport.authenticate("facebook"),
   async (req, res, next) => {
-    console.log("in redirect")
     try {
       res.cookie("accessToken", req.user.tokens.accessToken, {
         httpOnly: true,
+        secure: false,
       })
-      res.cookie("refreshToken", req.user.tokens.refreshToken, { httpOnly: true })
+      res.cookie("refreshToken", req.user.tokens.refreshToken, {
+        httpOnly: true,
+        secure: false,
+      })
       res.redirect(`http://localhost:4000/users/me`)
     } catch (error) {
       next(error)
@@ -69,16 +72,42 @@ authRouter.get(
 
 authRouter.get("/refreshToken", async (req, res, next) => {
   try {
-    const { refreshTokenOld } = req.cookies.refreshToken
-    console.log(refreshTokenOld)
-    const { newAccessToken, newRefreshToken } = await refreshToken(refreshTokenOld)
-    res.cookie("accessToken", newAccessToken, {
+    const refreshTokenOld = req.cookies.refreshToken
+    const { accessToken, refreshToken } = await refreshTokenFunc(refreshTokenOld)
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
+      secure: false,
     })
-    res.cookie("refreshToken", newRefreshToken, { httpOnly: true })
+    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: false })
+    res.redirect(`http://localhost:4000/users/me`)
   } catch (error) {
     next(error)
   }
 })
+
+authRouter.get(
+  "/googleLogin",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+)
+
+authRouter.get(
+  "/redirectGoogle",
+  passport.authenticate("google"),
+  async (req, res, next) => {
+    try {
+      res.cookie("accessToken", req.user.tokens.accessToken, {
+        httpOnly: true,
+        secure: false,
+      })
+      res.cookie("refreshToken", req.user.tokens.refreshToken, {
+        httpOnly: true,
+        secure: false,
+      })
+      res.redirect(`http://localhost:4000/users/me`)
+    } catch (error) {
+      next(error)
+    }
+  }
+)
 
 export default authRouter

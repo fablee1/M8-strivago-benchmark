@@ -13,13 +13,14 @@ import authRouter from "./services/auth.js"
 import { errorMiddlewares } from "./errorMiddlewares.js"
 import cookieParser from "cookie-parser"
 import passport from "passport"
-import facebookStrategy from "./auth/oauth.js"
+import facebookStrategy, { googleStrategy } from "./auth/oauth.js"
 
 const port = process.env.PORT || 3001
 const server = express()
 
 server.use(cookieParser())
 passport.use("facebook", facebookStrategy)
+passport.use("google", googleStrategy)
 
 // Middlewares
 const whitelist = [process.env.FRONTEND_URL, process.env.FRONTEND_PROD_URL]

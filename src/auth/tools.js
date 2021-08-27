@@ -43,13 +43,12 @@ const verifyRefresh = (token) =>
     jwt.verify(token, process.env.JWT_REFRESH_SECRET, (err, decodedToken) => {
       if (err) {
         reject(err)
-        console.log(err)
       }
       resolve(decodedToken)
     })
   )
 
-export const refreshToken = async (actualRefreshToken) => {
+export const refreshTokenFunc = async (actualRefreshToken) => {
   try {
     const data = await verifyRefresh(actualRefreshToken)
     const user = await UserModel.findById(data._id)
