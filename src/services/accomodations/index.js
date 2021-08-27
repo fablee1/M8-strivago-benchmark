@@ -1,23 +1,25 @@
 import { Router } from "express"
 import createError from "http-errors"
-import passport from "passport"
+import { JWTAuthMiddleware } from "../../auth/middlewares.js"
+import { hostOnly } from "../users/sharedMiddlewares.js"
 
 import AccomodationModel from "./schema.js"
 
 const accomodationsRouter = Router()
 
-accomodationsRouter.get("/", async (req, res, next) => {
+accomodationsRouter.get("/", JWTAuthMiddleware, async (req, res, next) => {
   try {
-    const accomodations = await AccomodationModel.find() //.populate("User")
+    const accomodations = await AccomodationModel.find().populate("host")
     res.send(accomodations)
   } catch (error) {
+    console.log(error)
     next(error)
   }
 })
 
-accomodationsRouter.get("/:id", async (req, res, next) => {
+accomodationsRouter.get("/:id", JWTAuthMiddleware, async (req, res, next) => {
   try {
-    const accomodation = await AccomodationModel.findById(req.params.id) //.populate("User")
+    const accomodation = await AccomodationModel.findById(req.params.id).populate("host")
 
     if (accomodation) {
       res.send(accomodation)
@@ -29,7 +31,7 @@ accomodationsRouter.get("/:id", async (req, res, next) => {
   }
 })
 
-accomodationsRouter.post("/", async (req, res, next) => {
+accomodationsRouter.post("/", JWTAuthMiddleware, hostOnly, async (req, res, next) => {
   try {
     const newAccomodation = new AccomodationModel(req.body)
     const { _id } = await newAccomodation.save()
@@ -39,7 +41,7 @@ accomodationsRouter.post("/", async (req, res, next) => {
   }
 })
 
-accomodationsRouter.put("/:id", async (req, res, next) => {
+accomodationsRouter.put("/:id", JWTAuthMiddleware, hostOnly, async (req, res, next) => {
   try {
     const updatedAccomodation = await AccomodationModel.findByIdAndUpdate(
       req.params.id,
@@ -59,17 +61,22 @@ accomodationsRouter.put("/:id", async (req, res, next) => {
   }
 })
 
-accomodationsRouter.delete("/:id", async (req, res, next) => {
-  try {
-    const accomodationDeleted = await AccomodationModel.findByIdAndDelete(req.params.id)
-    if (accomodationDeleted) {
-      res.sendStatus(204)
-    } else {
-      next(createError(404, `Accomodation with _id ${req.params.id} not found!`))
+accomodationsRouter.delete(
+  "/:id",
+  JWTAuthMiddleware,
+  hostOnly,
+  async (req, res, next) => {
+    try {
+      const accomodationDeleted = await AccomodationModel.findByIdAndDelete(req.params.id)
+      if (accomodationDeleted) {
+        res.sendStatus(204)
+      } else {
+        next(createError(404, `Accomodation with _id ${req.params.id} not found!`))
+      }
+    } catch (error) {
+      next(error)
     }
-  } catch (error) {
-    next(error)
   }
-})
+)
 
 export default accomodationsRouter
