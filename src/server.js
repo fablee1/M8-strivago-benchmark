@@ -41,7 +41,7 @@ server.use(express.json())
 server.use(morgan("dev"))
 
 server.use("/users", usersRouter)
-server.use("/accomodations", accomodationsRouter)
+server.use("/accomodation", accomodationsRouter)
 server.use("/auth", authRouter)
 
 server.use([errorMiddlewares])
