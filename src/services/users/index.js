@@ -49,7 +49,7 @@ usersRouter.get("/:userId",JWTAuthMiddleware, hostOnly, async (req, res, next) =
 
 /***************POST USER DETAILS*******************/
 
-usersRouter.post("/", async (req, res, next) => {
+/* usersRouter.post("/", async (req, res, next) => {
     try {
         const { email } = req.body
         const user = await UserModel.findOne({ email: email})
@@ -64,15 +64,20 @@ usersRouter.post("/", async (req, res, next) => {
         console.log(error);
         next(error)
     }
-})
+}) */
 
 /***************EDIT ONLY YOUR USER DEATILS*******************/
 
 usersRouter.put("/me",JWTAuthMiddleware, async (req, res, next) => {
     try {
-        req.user = {...req.body}
+        console.log("req.user",req.user);
+        console.log("req.body", req.body);
+        req.user.name = req.body.name ? req.body.name : req.user.name
+        req.user.surname = req.body.surname ? req.body.surname : req.user.surname
+        req.user.email = req.body.email ? req.body.email : req.user.email
+        req.user.role = req.body.role ? req.body.role : req.user.role
         const editUser = await req.user.save()
-        req.send(editUser)
+        res.send(editUser)
     } catch (error) {
         console.log(error);
         next(error)

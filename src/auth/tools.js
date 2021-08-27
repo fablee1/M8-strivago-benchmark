@@ -1,18 +1,17 @@
 import jwt from "jsonwebtoken";
 
 export const JWTAuthenticate = async (user) => {
-    const accessToken = await generateJWT({_id: user._id})
+    const accessToken = await generateJWT({_id:user._id, role: user.role})
     return accessToken
 }
 
-const generateJWT = (payload) => {
+const generateJWT = (payload) => 
     new Promise((resolve, reject) => 
-    jwt.sign(payload, process.env.JWT_SECRET, {expiresIn:"1 week"}, (err, token) => {
+        jwt.sign(payload, process.env.JWT_SECRET, {expiresIn:"1 week"}, (err, token) => {
         if(err) reject(err)
         resolve(token)
     })
     )
-}
 
 export const verifyJWT = (token) => 
     new Promise((resolve, reject) => 
