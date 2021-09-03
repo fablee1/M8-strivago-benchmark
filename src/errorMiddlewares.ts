@@ -1,4 +1,6 @@
-const notFoundMiddleware = (err, req, res, next) => {
+import { ErrorRequestHandler } from "express"
+
+const notFoundMiddleware: ErrorRequestHandler = (err, req, res, next) => {
   if (err.status === 404) {
     res.status(404).send({ successful: false, message: err.message })
   } else {
@@ -6,7 +8,7 @@ const notFoundMiddleware = (err, req, res, next) => {
   }
 }
 
-const badRequestMiddleware = (err, req, res, next) => {
+const badRequestMiddleware: ErrorRequestHandler = (err, req, res, next) => {
   if (err.status === 400) {
     res.status(400).send(err.errorsList)
   } else {
@@ -14,7 +16,7 @@ const badRequestMiddleware = (err, req, res, next) => {
   }
 }
 
-const unAuthorizedHandler = (err, req, res, next) => {
+const unAuthorizedHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (err.status === 401) {
     res.status(401).send(err.message || "You are not logged in!")
   } else {
@@ -22,7 +24,7 @@ const unAuthorizedHandler = (err, req, res, next) => {
   }
 }
 
-const forbiddenHandler = (err, req, res, next) => {
+const forbiddenHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (err.status === 403) {
     res.status(403).send(err.message || "You are not allowed to do that!")
   } else {
@@ -30,7 +32,7 @@ const forbiddenHandler = (err, req, res, next) => {
   }
 }
 
-const catchErrorMiddleware = (err, req, res, next) => {
+const catchErrorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
   res.status(500).send("Generic Server Error")
 }
 

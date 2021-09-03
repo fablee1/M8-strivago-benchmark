@@ -1,6 +1,11 @@
-import mongoose from "mongoose"
+import mongoose, { Document, Model } from "mongoose"
+import { Accomodation } from "../../types"
 
 const { Schema, model } = mongoose
+
+interface AccomodationDocument extends Document, Accomodation {}
+
+interface AccomodationModel extends Model<AccomodationDocument> {}
 
 const AccomodationSchema = new Schema(
   {
@@ -31,4 +36,7 @@ const AccomodationSchema = new Schema(
   }
 )
 
-export default model("Accomodation", AccomodationSchema)
+export default model<AccomodationDocument, AccomodationModel>(
+  "Accomodation",
+  AccomodationSchema
+)

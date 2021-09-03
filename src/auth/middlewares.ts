@@ -1,17 +1,22 @@
+import { NextFunction, Response, Request } from "express"
 import createError from "http-errors"
-import UserModel from "../services/users/schema.js"
-import { verifyJWT } from "./tools.js"
+import UserModel, { UserDocument } from "../services/users/schema"
+import { verifyJWT } from "./tools"
 
-export const JWTAuthMiddleware = async (req, res, next) => {
+export const JWTAuthMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.cookies.accessToken) {
     next(createError(401, "please provide credentials in the authorization header!!"))
   } else {
     try {
       const token = req.cookies.accessToken
-      const decodedToken = await verifyJWT(token)
+      const decodedToken: any = await verifyJWT(token)
       const user = await UserModel.findById(decodedToken._id)
       if (user) {
-        req.user = user
+        req.user = user as UserDocument
         next()
       } else {
         next(createError(404, "User not found"))

@@ -1,9 +1,16 @@
-import mongoose from "mongoose"
+import mongoose, { Model, Document } from "mongoose"
 import bcrypt from "bcrypt"
+import { User } from "../../types"
 
 const { Schema, model } = mongoose
 
-const UserSchema = new Schema(
+export interface UserDocument extends Document, User {}
+
+export interface UserMod extends Model<UserDocument> {
+  checkCredentials(email: string, password: string): Promise<UserDocument | null>
+}
+
+const UserSchema = new Schema<UserDocument>(
   {
     name: {
       type: String,
@@ -18,9 +25,6 @@ const UserSchema = new Schema(
     email: {
       type: String,
       description: "email is a required field",
-      // index: {
-      //   unique: true,
-      // },
     },
     password: {
       type: String,
@@ -47,7 +51,7 @@ const UserSchema = new Schema(
 
 UserSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
-    this.password = await bcrypt.hash(this.password, 10)
+    this.password = await bcrypt.hash(this.password!, 10)
   }
   next()
 })
@@ -60,7 +64,7 @@ UserSchema.methods.toJSON = function () {
   return userObject
 }
 
-UserSchema.statics.checkCredentials = async function (email, password) {
+UserSchema.statics.checkCredentials = async function (email: string, password: string) {
   const user = await this.findOne({ email })
   if (user) {
     const isMatch = await bcrypt.compare(password, user.password)
@@ -74,4 +78,4 @@ UserSchema.statics.checkCredentials = async function (email, password) {
   }
 }
 
-export default model("User", UserSchema)
+export default model<UserDocument, UserMod>("User", UserSchema)

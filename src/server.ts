@@ -6,14 +6,16 @@ import createError from "http-errors"
 import morgan from "morgan"
 import mongoose from "mongoose"
 
-import usersRouter from "./services/users/index.js"
-import accomodationsRouter from "./services/accomodations/index.js"
-import authRouter from "./services/auth.js"
+import usersRouter from "./services/users/index"
+import accomodationsRouter from "./services/accomodations/index"
+import authRouter from "./services/auth"
 
-import { errorMiddlewares } from "./errorMiddlewares.js"
+import { errorMiddlewares } from "./errorMiddlewares"
 import cookieParser from "cookie-parser"
 import passport from "passport"
-import facebookStrategy, { googleStrategy } from "./auth/oauth.js"
+import facebookStrategy, { googleStrategy } from "./auth/oauth"
+
+process.env.TS_NODE_DEV && require("dotenv").config()
 
 const port = process.env.PORT || 3001
 const server = express()
@@ -45,7 +47,7 @@ server.use("/users", usersRouter)
 server.use("/accomodation", accomodationsRouter)
 server.use("/auth", authRouter)
 
-server.use([errorMiddlewares])
+server.use(errorMiddlewares)
 
 console.table(listEndpoints(server))
 
@@ -57,10 +59,7 @@ server.use((req, res) => {
 })
 
 mongoose
-  .connect(process.env.MONGO_CONNECTION, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_CONNECTION!)
   .then(() =>
     server.listen(port, () => {
       console.log("Server running on port ", port)

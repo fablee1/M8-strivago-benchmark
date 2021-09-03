@@ -1,8 +1,8 @@
 import { Router } from "express"
 import createError from "http-errors"
 import passport from "passport"
-import { JWTAuthenticate, refreshTokenFunc } from "../auth/tools.js"
-import UserModel from "./users/schema.js"
+import { JWTAuthenticate, refreshTokenFunc } from "../auth/tools"
+import UserModel from "./users/schema"
 
 const authRouter = Router()
 
@@ -55,11 +55,11 @@ authRouter.get(
   passport.authenticate("facebook"),
   async (req, res, next) => {
     try {
-      res.cookie("accessToken", req.user.tokens.accessToken, {
+      res.cookie("accessToken", (req.user as any).tokens.accessToken, {
         httpOnly: true,
         secure: false,
       })
-      res.cookie("refreshToken", req.user.tokens.refreshToken, {
+      res.cookie("refreshToken", (req.user as any).tokens.refreshToken, {
         httpOnly: true,
         secure: false,
       })
@@ -95,11 +95,11 @@ authRouter.get(
   passport.authenticate("google"),
   async (req, res, next) => {
     try {
-      res.cookie("accessToken", req.user.tokens.accessToken, {
+      res.cookie("accessToken", (req.user as any).tokens.accessToken, {
         httpOnly: true,
         secure: false,
       })
-      res.cookie("refreshToken", req.user.tokens.refreshToken, {
+      res.cookie("refreshToken", (req.user as any).tokens.refreshToken, {
         httpOnly: true,
         secure: false,
       })
